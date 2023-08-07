@@ -37,9 +37,7 @@ build-debug build-release: build-%: cmake-%
 # Test
 .PHONY: test-debug test-release
 test-debug test-release: test-%: build-%
-	# @cmake --build build_$* -j $(NPROCS) --target pg_service_template_unittest
 	@cd build_$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
-	@pep8 tests
 
 # Start the service (via testsuite service runner)
 .PHONY: service-start-debug service-start-release
