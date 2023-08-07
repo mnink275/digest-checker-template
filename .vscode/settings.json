@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "optional": "cpp"
+    },
+    "cmake.buildDirectory": "${workspaceFolder}/build_debug",
+    "clangd.arguments": [
+        "-background-index",
+        "-compile-commands-dir=${workspaceFolder}/build_debug"
+    ],
+    "cmake.configureOnOpen": false,
+}

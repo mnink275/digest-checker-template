@@ -4,7 +4,6 @@ compile_commands.json
 .cache/
 .ccache/
 .idea/
-.vscode/
 .pgdata/
 .cores/
 cmake-build-*
