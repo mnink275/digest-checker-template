@@ -12,7 +12,6 @@ async def test_postgres(service_client):
     )
     assert response.status == 200
     assert response.content == b'Hello world, Dear User!\n'
-    # /// [Functional test]
  
     response = await service_client.get(
         '/v1/hello', headers={'Authorization': 'wrong format'},
