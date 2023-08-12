@@ -6,6 +6,16 @@ components_manager:
             blocking_task_processor: fs-task-processor
             dns_resolver: async
 
+        auth-digest-checker-settings:
+            algorithm: MD5
+            qops:
+              - auth
+              - auth-int
+            is-proxy: false
+            is-session: true
+            domains:
+              - /v1/hello
+
         auth-pg-cache:
             pgcomponent: auth-database
             update-interval: 10s

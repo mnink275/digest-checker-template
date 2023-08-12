@@ -9,8 +9,8 @@ add_subdirectory(third_party/userver)
 
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
-	src/auth_bearer.cpp
-	src/auth_bearer.hpp
+	src/auth_digest.cpp
+	src/auth_digest.hpp
 	src/user_info_cache.hpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core userver-postgresql)

@@ -1,5 +1,6 @@
-#include "auth_bearer.hpp"
+#include "auth_digest.hpp"
 #include "user_info_cache.hpp"
+#include "userver/logging/log.hpp"
 
 #include <userver/utest/using_namespace_userver.hpp>
 
@@ -13,6 +14,8 @@
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
 
+#include <userver/server/handlers/auth/auth_digest_checker_component.hpp>
+
 namespace samples::pg {
 
 class Hello final : public server::handlers::HttpHandlerBase {
@@ -24,7 +27,7 @@ class Hello final : public server::handlers::HttpHandlerBase {
   std::string HandleRequestThrow(
       const server::http::HttpRequest&,
       server::request::RequestContext& ctx) const override {
-    return "Hello world, " + ctx.GetData<std::string>("name") + "!\n";
+    return "Hello world";
   }
 };
 
@@ -34,11 +37,14 @@ int main(int argc, const char* const argv[]) {
   server::handlers::auth::RegisterAuthCheckerFactory(
       "bearer", std::make_unique<samples::pg::CheckerFactory>());
 
-  const auto component_list = components::MinimalServerComponentList()
-                                  .Append<samples::pg::AuthCache>()
-                                  .Append<components::Postgres>("auth-database")
-                                  .Append<samples::pg::Hello>()
-                                  .Append<components::TestsuiteSupport>()
-                                  .Append<clients::dns::Component>();
+  const auto component_list =
+      components::MinimalServerComponentList()
+          .Append<samples::pg::AuthCache>()
+          .Append<components::Postgres>("auth-database")
+          .Append<samples::pg::Hello>()
+          .Append<components::TestsuiteSupport>()
+          .Append<clients::dns::Component>()
+          .Append<
+              userver::server::handlers::auth::AuthDigestCheckerComponent>();
   return utils::DaemonMain(argc, argv, component_list);
 }
