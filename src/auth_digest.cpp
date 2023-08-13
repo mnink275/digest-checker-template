@@ -35,10 +35,13 @@ server::handlers::auth::AuthCheckerBasePtr CheckerFactory::operator()(
     const ::components::ComponentContext& context,
     const server::handlers::auth::HandlerAuthConfig& auth_config,
     const server::handlers::auth::AuthCheckerSettings&) const {
-  const auto& digest_auth_settings = context.FindComponent<
-      userver::server::handlers::auth::AuthDigestCheckerComponent>().GetSettings();
-  return std::make_shared<AuthCheckerDigest>(digest_auth_settings, "registred_user@host.com",
-                                             context);
+  const auto& digest_auth_settings =
+      context
+          .FindComponent<
+              userver::server::handlers::auth::AuthDigestCheckerComponent>()
+          .GetSettings();
+  return std::make_shared<AuthCheckerDigest>(
+      digest_auth_settings, "registred_user@host.com", context);
 }
 
 }  // namespace samples::pg
