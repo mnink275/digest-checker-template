@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <userver/utest/using_namespace_userver.hpp>
 
 #include <vector>
@@ -12,27 +13,25 @@
 namespace samples::pg {
 
 struct UserDbInfo {
-  server::auth::UserAuthInfo::Ticket token;
-  std::int64_t user_id;
-  std::vector<std::string> scopes;
-  std::string name;
+  std::string username;
+  std::string ha1;
 };
 
 struct AuthCachePolicy {
   static constexpr std::string_view kName = "auth-pg-cache";
 
   using ValueType = UserDbInfo;
-  static constexpr auto kKeyMember = &UserDbInfo::token;
+  static constexpr auto kKeyMember = &UserDbInfo::username;
   static constexpr const char* kQuery =
-      "SELECT token, user_id, scopes, name FROM auth_schema.tokens";
+      "SELECT username, ha1 FROM auth_schema.tokens";
   static constexpr const char* kUpdatedField = "updated";
   using UpdatedFieldType = storages::postgres::TimePointTz;
 
   // Using crypto::algorithm::StringsEqualConstTimeComparator to avoid timing
   // attack at find(token).
   using CacheContainer =
-      std::unordered_map<server::auth::UserAuthInfo::Ticket, UserDbInfo,
-                         std::hash<server::auth::UserAuthInfo::Ticket>,
+      std::unordered_map<std::string, UserDbInfo,
+                         std::hash<std::string>,
                          crypto::algorithm::StringsEqualConstTimeComparator>;
 };
 

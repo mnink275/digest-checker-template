@@ -5,6 +5,7 @@
 #include "userver/storages/postgres/postgres_fwd.hpp"
 
 #include <algorithm>
+#include <optional>
 #include <userver/http/common_headers.hpp>
 #include <userver/server/handlers/auth/auth_digest_checker_base.hpp>
 
@@ -17,18 +18,28 @@ class AuthCheckerDigest final
   using AuthDigestSettings =
       userver::server::handlers::auth::AuthDigestSettings;
 
-  AuthCheckerDigest(const AuthDigestSettings& digest_settings,
+  AuthCheckerDigest(const AuthCache& auth_cache, 
+                    const AuthDigestSettings& digest_settings,
                     std::string realm,
                     const ::components::ComponentContext& context)
       : server::handlers::auth::AuthCheckerDigestBase(digest_settings,
-                                                      std::move(realm)) {}
+                     std::move(realm)), auth_cache_(auth_cache) {}
 
-  HA1 GetHA1(std::string_view username) const override;
+  std::optional<HA1> GetHA1(const std::string& username) const override;
+
+private:
+  const AuthCache& auth_cache_;
 };
 
-AuthCheckerDigest::HA1 AuthCheckerDigest::GetHA1(
-    std::string_view username) const {
-  return HA1{"dcd98b7102dd2f0e8b11d0f600bfb0c093"};
+std::optional<AuthCheckerDigest::HA1> AuthCheckerDigest::GetHA1(
+    const std::string& username) const {
+  const auto cache_snapshot = auth_cache_.Get();
+
+  auto finding_iterator = cache_snapshot->find(username);
+  if(finding_iterator == cache_snapshot->end())
+    return std::nullopt;
+
+  return HA1{finding_iterator->second.ha1};
 }
 
 server::handlers::auth::AuthCheckerBasePtr CheckerFactory::operator()(
