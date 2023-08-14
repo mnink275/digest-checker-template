@@ -15,6 +15,7 @@ components_manager:
             is-session: true
             domains:
               - /v1/hello
+            nonce-ttl: 1000s
 
         auth-pg-cache:
             pgcomponent: auth-database
@@ -26,10 +27,8 @@ components_manager:
             method: GET
             auth:           # Authorization config for this handler
                 types:
-                  - bearer  # Authorization type that was specified in main()
-                scopes:     # Required user scopes for that handler
-                  - read
-                  - hello
+                  - digest  # Authorization type that was specified in main()
+                realm: registred@userver.com
 
         testsuite-support:
 

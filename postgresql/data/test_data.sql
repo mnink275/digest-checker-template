@@ -1,3 +1,2 @@
-INSERT INTO auth_schema.tokens(token, user_id, scopes, name) VALUES
-('wrong-scopes-token', 1, '{"just_wrong"}', 'Bad Man'),
-('THE_USER_TOKEN', 2, '{"read", "hello", "info"}', 'Dear User');
+INSERT INTO auth_schema.users_hash1(username, ha1) VALUES
+('username', '180aa8fac42262ec881b27dd4df6d2e2');

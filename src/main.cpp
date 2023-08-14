@@ -35,7 +35,7 @@ class Hello final : public server::handlers::HttpHandlerBase {
 
 int main(int argc, const char* const argv[]) {
   server::handlers::auth::RegisterAuthCheckerFactory(
-      "bearer", std::make_unique<samples::pg::CheckerFactory>());
+      "digest", std::make_unique<samples::pg::CheckerFactory>());
 
   const auto component_list =
       components::MinimalServerComponentList()

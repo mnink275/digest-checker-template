@@ -5,5 +5,5 @@ CREATE SCHEMA IF NOT EXISTS auth_schema;
 CREATE TABLE IF NOT EXISTS auth_schema.users_hash1 (
     username TEXT NOT NULL,
     ha1 TEXT NOT NULL,
-    updated TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

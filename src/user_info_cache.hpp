@@ -23,7 +23,7 @@ struct AuthCachePolicy {
   using ValueType = UserDbInfo;
   static constexpr auto kKeyMember = &UserDbInfo::username;
   static constexpr const char* kQuery =
-      "SELECT username, ha1 FROM auth_schema.tokens";
+      "SELECT username, ha1 FROM auth_schema.users_hash1";
   static constexpr const char* kUpdatedField = "updated";
   using UpdatedFieldType = storages::postgres::TimePointTz;
 
