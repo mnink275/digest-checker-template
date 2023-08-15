@@ -30,8 +30,7 @@ struct AuthCachePolicy {
   // Using crypto::algorithm::StringsEqualConstTimeComparator to avoid timing
   // attack at find(token).
   using CacheContainer =
-      std::unordered_map<std::string, UserDbInfo,
-                         std::hash<std::string>,
+      std::unordered_map<std::string, UserDbInfo, std::hash<std::string>,
                          crypto::algorithm::StringsEqualConstTimeComparator>;
 };
 

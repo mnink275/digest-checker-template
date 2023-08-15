@@ -18,16 +18,17 @@ class AuthCheckerDigest final
   using AuthDigestSettings =
       userver::server::handlers::auth::AuthDigestSettings;
 
-  AuthCheckerDigest(const AuthCache& auth_cache, 
+  AuthCheckerDigest(const AuthCache& auth_cache,
                     const AuthDigestSettings& digest_settings,
                     std::string realm,
                     const ::components::ComponentContext& context)
       : server::handlers::auth::AuthCheckerDigestBase(digest_settings,
-                     std::move(realm)), auth_cache_(auth_cache) {}
+                                                      std::move(realm)),
+        auth_cache_(auth_cache) {}
 
   std::optional<HA1> GetHA1(const std::string& username) const override;
 
-private:
+ private:
   const AuthCache& auth_cache_;
 };
 
@@ -36,8 +37,7 @@ std::optional<AuthCheckerDigest::HA1> AuthCheckerDigest::GetHA1(
   const auto cache_snapshot = auth_cache_.Get();
 
   auto finding_iterator = cache_snapshot->find(username);
-  if(finding_iterator == cache_snapshot->end())
-    return std::nullopt;
+  if (finding_iterator == cache_snapshot->end()) return std::nullopt;
 
   return HA1{finding_iterator->second.ha1};
 }
@@ -47,11 +47,11 @@ server::handlers::auth::AuthCheckerBasePtr CheckerFactory::operator()(
     const server::handlers::auth::HandlerAuthConfig& auth_config,
     const server::handlers::auth::AuthCheckerSettings&) const {
   const auto& digest_auth_settings =
-      context
-          .FindComponent<component::AuthDigestCheckerComponent>()
+      context.FindComponent<component::AuthDigestCheckerComponent>()
           .GetSettings();
-  return std::make_shared<AuthCheckerDigest>(context.FindComponent<AuthCache>(),
-      digest_auth_settings, auth_config["realm"].As<std::string>({}), context);
+  return std::make_shared<AuthCheckerDigest>(
+      context.FindComponent<AuthCache>(), digest_auth_settings,
+      auth_config["realm"].As<std::string>({}), context);
 }
 
 }  // namespace samples::pg
