@@ -12,7 +12,7 @@ components_manager:
               - auth
               - auth-int
             is-proxy: false
-            is-session: true
+            is-session: false
             domains:
               - /v1/hello
             nonce-ttl: 1000s
