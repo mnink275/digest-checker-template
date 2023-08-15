@@ -48,8 +48,7 @@ server::handlers::auth::AuthCheckerBasePtr CheckerFactory::operator()(
     const server::handlers::auth::AuthCheckerSettings&) const {
   const auto& digest_auth_settings =
       context
-          .FindComponent<
-              userver::server::handlers::auth::AuthDigestCheckerComponent>()
+          .FindComponent<component::AuthDigestCheckerComponent>()
           .GetSettings();
   return std::make_shared<AuthCheckerDigest>(context.FindComponent<AuthCache>(),
       digest_auth_settings, auth_config["realm"].As<std::string>({}), context);

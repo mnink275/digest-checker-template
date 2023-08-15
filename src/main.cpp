@@ -44,7 +44,6 @@ int main(int argc, const char* const argv[]) {
           .Append<samples::pg::Hello>()
           .Append<components::TestsuiteSupport>()
           .Append<clients::dns::Component>()
-          .Append<
-              userver::server::handlers::auth::AuthDigestCheckerComponent>();
+          .Append<component::AuthDigestCheckerComponent>();
   return utils::DaemonMain(argc, argv, component_list);
 }
