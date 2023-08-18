@@ -8,6 +8,7 @@
 #include <optional>
 #include <userver/http/common_headers.hpp>
 #include <userver/server/handlers/auth/auth_digest_checker_base.hpp>
+#include <userver/server/handlers/auth/auth_digest_checker_component.hpp>
 
 namespace samples::pg {
 
