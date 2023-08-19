@@ -1,3 +1,4 @@
 [submodule "third_party/userver"]
 	path = third_party/userver
-	url = git@git.yandex-academy.ru:nmingaripov/digest-checker.git
+	url = https://github.com/mnink275/userver.git
+	branch = digest-checker
