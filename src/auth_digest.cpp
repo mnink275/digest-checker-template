@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <optional>
 #include <userver/http/common_headers.hpp>
-#include <userver/server/handlers/auth/auth_digest_checker_base.hpp>
 #include <userver/server/handlers/auth/auth_digest_checker_component.hpp>
+#include <userver/server/handlers/auth/auth_digest_checker_stand_alone.hpp>
 
 namespace samples::pg {
 
 class AuthCheckerDigest final
-    : public server::handlers::auth::AuthCheckerDigestBase {
+    : public server::handlers::auth::AuthCheckerDigestBaseStandAlone {
  public:
   using AuthCheckResult = server::handlers::auth::AuthCheckResult;
   using AuthDigestSettings =
@@ -23,8 +23,8 @@ class AuthCheckerDigest final
                     const AuthDigestSettings& digest_settings,
                     std::string realm,
                     const ::components::ComponentContext& context)
-      : server::handlers::auth::AuthCheckerDigestBase(digest_settings,
-                                                      std::move(realm)),
+      : server::handlers::auth::AuthCheckerDigestBaseStandAlone(
+            digest_settings, std::move(realm)),
         auth_cache_(auth_cache) {}
 
   std::optional<HA1> GetHA1(const std::string& username) const override;
