@@ -17,10 +17,6 @@ components_manager:
               - /v1/hello
             nonce-ttl: 1000s
 
-        auth-pg-cache:
-            pgcomponent: auth-database
-            update-interval: 10s
-
         handler-hello:
             path: /v1/hello
             task_processor: main-task-processor

@@ -11,7 +11,7 @@ add_subdirectory(third_party/userver)
 add_library(${PROJECT_NAME}_objs OBJECT
 	src/auth_digest.cpp
 	src/auth_digest.hpp
-	src/user_info_cache.hpp
+	src/user_info.hpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core userver-postgresql)
 

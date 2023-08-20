@@ -1,5 +1,5 @@
 #include "auth_digest.hpp"
-#include "user_info_cache.hpp"
+#include "user_info.hpp"
 #include "userver/logging/log.hpp"
 
 #include <userver/utest/using_namespace_userver.hpp>
@@ -39,7 +39,6 @@ int main(int argc, const char* const argv[]) {
 
   const auto component_list =
       components::MinimalServerComponentList()
-          .Append<samples::pg::AuthCache>()
           .Append<components::Postgres>("auth-database")
           .Append<samples::pg::Hello>()
           .Append<components::TestsuiteSupport>()

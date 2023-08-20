@@ -19,14 +19,12 @@ async def test_postgres(service_client):
     assert 'realm' in authentication_directives
     assert 'nonce' in authentication_directives
     assert 'algorithm' in authentication_directives
-    assert 'opaque' in authentication_directives
     assert 'qop' in authentication_directives
 
     ## now construct Authorization header sent from client
     chal = {'realm': authentication_directives["realm"], 
             'nonce': authentication_directives["nonce"],
             'algorithm': authentication_directives["algorithm"],
-            'opaque': authentication_directives["opaque"],
             'qop': "auth"
             }
 
@@ -49,13 +47,11 @@ async def test_postgres(service_client):
     assert 'realm' in authentication_directives
     assert 'nonce' in authentication_directives
     assert 'algorithm' in authentication_directives
-    assert 'opaque' in authentication_directives
     assert 'qop' in authentication_directives
 
     chal = {'realm': authentication_directives["realm"], 
             'nonce': authentication_directives["nonce"],
             'algorithm': authentication_directives["algorithm"],
-            'opaque': authentication_directives["opaque"],
             'qop': "auth"
             }
 
@@ -82,14 +78,12 @@ async def test_postgres_wrong_data(service_client):
     assert 'realm' in authentication_directives
     assert 'nonce' in authentication_directives
     assert 'algorithm' in authentication_directives
-    assert 'opaque' in authentication_directives
     assert 'qop' in authentication_directives
 
     ## now construct Authorization header sent from client
     chal = {'realm': authentication_directives["realm"], 
             'nonce': authentication_directives["nonce"],
             'algorithm': authentication_directives["algorithm"],
-            'opaque': authentication_directives["opaque"],
             'qop': "auth"
             }
 
@@ -112,13 +106,11 @@ async def test_postgres_wrong_data(service_client):
     assert 'realm' in authentication_directives
     assert 'nonce' in authentication_directives
     assert 'algorithm' in authentication_directives
-    assert 'opaque' in authentication_directives
     assert 'qop' in authentication_directives
 
     chal = {'realm': authentication_directives["realm"], 
             'nonce': authentication_directives["nonce"],
             'algorithm': authentication_directives["algorithm"],
-            'opaque': authentication_directives["opaque"],
             'qop': "auth"
             }
 
@@ -208,14 +200,12 @@ async def test_repeated_auth(service_client):
     assert 'realm' in authentication_directives
     assert 'nonce' in authentication_directives
     assert 'algorithm' in authentication_directives
-    assert 'opaque' in authentication_directives
     assert 'qop' in authentication_directives
 
     ## now construct Authorization header sent from client
     chal = {'realm': authentication_directives["realm"], 
             'nonce': authentication_directives["nonce"],
             'algorithm': authentication_directives["algorithm"],
-            'opaque': authentication_directives["opaque"],
             'qop': "auth"
             }
 
@@ -238,13 +228,11 @@ async def test_repeated_auth(service_client):
     assert 'realm' in authentication_directives
     assert 'nonce' in authentication_directives
     assert 'algorithm' in authentication_directives
-    assert 'opaque' in authentication_directives
     assert 'qop' in authentication_directives
 
     chal = {'realm': authentication_directives["realm"], 
             'nonce': authentication_directives["nonce"],
             'algorithm': authentication_directives["algorithm"],
-            'opaque': authentication_directives["opaque"],
             'qop': "auth"
             }
 
