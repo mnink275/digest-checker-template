@@ -10,7 +10,6 @@ components_manager:
             algorithm: MD5
             qops:
               - auth
-              - auth-int
             is-proxy: false
             is-session: false
             domains:

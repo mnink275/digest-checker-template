@@ -14,7 +14,7 @@
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
 
-#include <userver/server/handlers/auth/auth_digest_checker_component.hpp>
+#include <userver/server/handlers/auth/digest_checker_settings_component.hpp>
 
 namespace samples::pg {
 
@@ -43,6 +43,6 @@ int main(int argc, const char* const argv[]) {
           .Append<samples::pg::Hello>()
           .Append<components::TestsuiteSupport>()
           .Append<clients::dns::Component>()
-          .Append<component::AuthDigestCheckerComponent>();
+          .Append<server::handlers::auth::DigestCheckerSettingsComponent>();
   return utils::DaemonMain(argc, argv, component_list);
 }
