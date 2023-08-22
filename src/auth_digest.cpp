@@ -2,7 +2,7 @@
 #include "user_info.hpp"
 #include "userver/logging/log.hpp"
 #include "userver/server/handlers/auth/auth_checker_settings.hpp"
-#include "userver/server/handlers/auth/auth_digest_checker_base.hpp"
+#include "userver/server/handlers/auth/digest_checker_base.hpp"
 #include "userver/storages/postgres/cluster_types.hpp"
 #include "userver/storages/postgres/component.hpp"
 #include "userver/storages/postgres/io/row_types.hpp"
@@ -18,12 +18,11 @@
 
 namespace samples::pg {
 
-using Nonce = server::handlers::auth::Nonce;
 using UserData = server::handlers::auth::UserData;
 using HA1 = server::handlers::auth::UserData::HA1;
 
 class AuthCheckerDigest final
-    : public server::handlers::auth::AuthCheckerDigestBase {
+    : public server::handlers::auth::DigestCheckerBase {
  public:
   using AuthCheckResult = server::handlers::auth::AuthCheckResult;
   using AuthDigestSettings =
@@ -32,8 +31,8 @@ class AuthCheckerDigest final
   AuthCheckerDigest(const AuthDigestSettings& digest_settings,
                     std::string realm,
                     const ::components::ComponentContext& context)
-      : server::handlers::auth::AuthCheckerDigestBase(digest_settings,
-                                                      std::move(realm)),
+      : server::handlers::auth::DigestCheckerBase(digest_settings,
+                                                  std::move(realm)),
         pg_cluster_(
             context
                 .FindComponent<userver::components::Postgres>("auth-database")
@@ -44,14 +43,14 @@ class AuthCheckerDigest final
   std::optional<UserData> GetUserData(
       const std::string& username) const override;
 
-  void SetUserData(const std::string& username, const Nonce& nonce,
+  void SetUserData(const std::string& username, const std::string& nonce,
                    std::int32_t nonce_count,
                    TimePoint nonce_creation_time) const override;
 
-  void PushUnnamedNonce(const Nonce& nonce,
+  void PushUnnamedNonce(const std::string& nonce,
                         std::chrono::milliseconds nonce_ttl) const override;
   std::optional<TimePoint> GetUnnamedNonceCreationTime(
-      const Nonce& nonce) const override;
+      const std::string& nonce) const override;
 
  private:
   userver::storages::postgres::ClusterPtr pg_cluster_;
@@ -122,7 +121,7 @@ std::optional<UserData> AuthCheckerDigest::GetUserData(
 }
 
 void AuthCheckerDigest::SetUserData(const std::string& username,
-                                    const Nonce& nonce,
+                                    const std::string& nonce,
                                     std::int32_t nonce_count,
                                     TimePoint nonce_creation_time) const {
   pg_cluster_->Execute(storages::postgres::ClusterHostType::kMaster,
@@ -131,14 +130,14 @@ void AuthCheckerDigest::SetUserData(const std::string& username,
 }
 
 void AuthCheckerDigest::PushUnnamedNonce(
-    const Nonce& nonce, std::chrono::milliseconds nonce_ttl) const {
+    const std::string& nonce, std::chrono::milliseconds nonce_ttl) const {
   auto res = pg_cluster_->Execute(storages::postgres::ClusterHostType::kMaster,
                                   kInsertUnnamedNonce, utils::datetime::Now(),
                                   nonce, utils::datetime::Now() + nonce_ttl);
 }
 
 std::optional<TimePoint> AuthCheckerDigest::GetUnnamedNonceCreationTime(
-    const Nonce& nonce) const {
+    const std::string& nonce) const {
   auto res =
       pg_cluster_->Execute(storages::postgres::ClusterHostType::kSlave,
                            kSelectUnnamedNonce, utils::datetime::Now(), nonce);
