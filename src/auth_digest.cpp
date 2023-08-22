@@ -72,14 +72,14 @@ class AuthCheckerDigest final
 
   const storages::postgres::Query kInsertUnnamedNonce{
       "WITH expired AS( "
-      "  SELECT id FROM auth_schema.unnamed_nonce WHERE expired_time <= $1 "
+      "  SELECT id FROM auth_schema.unnamed_nonce WHERE creation_time <= $1 "
       "LIMIT 1 "
       "), "
       "free_id AS ( "
       "SELECT COALESCE((SELECT id FROM expired LIMIT 1), "
       "nextval('nonce_id_seq')) AS id "
       ") "
-      "INSERT INTO auth_schema.unnamed_nonce (id, nonce, expired_time) "
+      "INSERT INTO auth_schema.unnamed_nonce (id, nonce, creation_time) "
       "SELECT "
       "  free_id.id, "
       "  $2, "
@@ -87,14 +87,14 @@ class AuthCheckerDigest final
       "FROM free_id "
       "ON CONFLICT (id) DO UPDATE SET "
       "  nonce=$2, "
-      "  expired_time=$3 "
+      "  creation_time=$3 "
       "  WHERE auth_schema.unnamed_nonce.id=(SELECT free_id.id FROM free_id "
       "LIMIT 1) ",
       storages::postgres::Query::Name{"insert_unnamed_nonce"}};
 
   const storages::postgres::Query kSelectUnnamedNonce{
-      "SELECT expired_time FROM auth_schema.unnamed_nonce WHERE expired_time > "
-      "$1 AND nonce=$2",
+      "UPDATE auth_schema.unnamed_nonce SET nonce='' WHERE nonce=$1 "
+      "RETURNING creation_time ",
       storages::postgres::Query::Name{"select_unnamed_nonce"}};
 };
 
@@ -131,16 +131,15 @@ void AuthCheckerDigest::SetUserData(const std::string& username,
 
 void AuthCheckerDigest::PushUnnamedNonce(
     const std::string& nonce, std::chrono::milliseconds nonce_ttl) const {
-  auto res = pg_cluster_->Execute(storages::postgres::ClusterHostType::kMaster,
-                                  kInsertUnnamedNonce, utils::datetime::Now(),
-                                  nonce, utils::datetime::Now() + nonce_ttl);
+  auto res = pg_cluster_->Execute(
+      storages::postgres::ClusterHostType::kMaster, kInsertUnnamedNonce,
+      utils::datetime::Now() - nonce_ttl, nonce, utils::datetime::Now());
 }
 
 std::optional<TimePoint> AuthCheckerDigest::GetUnnamedNonceCreationTime(
     const std::string& nonce) const {
-  auto res =
-      pg_cluster_->Execute(storages::postgres::ClusterHostType::kSlave,
-                           kSelectUnnamedNonce, utils::datetime::Now(), nonce);
+  auto res = pg_cluster_->Execute(storages::postgres::ClusterHostType::kSlave,
+                                  kSelectUnnamedNonce, nonce);
 
   if (res.IsEmpty()) return std::nullopt;
 

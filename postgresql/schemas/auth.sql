@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS auth_schema.users (
 CREATE TABLE IF NOT EXISTS auth_schema.unnamed_nonce (
     id integer NOT NULL,
     nonce TEXT NOT NULL,
-    expired_time TIMESTAMP NOT NULL,
+    creation_time TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
     UNIQUE(nonce)
 );
