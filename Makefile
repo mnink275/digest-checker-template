@@ -67,8 +67,6 @@ install: install-release
 .PHONY: format
 format:
 	@find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
-	@clang-format -i ./third_party/userver/core/src/server/handlers/auth/auth_digest_checker_base.cpp
-	@clang-format -i ./third_party/userver/core/include/userver/server/handlers/auth/auth_digest_checker_base.hpp
 
 # Internal hidden targets that are used only in docker environment
 --in-docker-start-debug --in-docker-start-release: --in-docker-start-%: install-%
