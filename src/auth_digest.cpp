@@ -39,8 +39,6 @@ class AuthCheckerDigest final
                 .FindComponent<userver::components::Postgres>("auth-database")
                 .GetCluster()) {}
 
-  std::optional<HA1> GetHA1(std::string_view username) const;
-
   std::optional<UserData> FetchUserData(
       std::string_view username) const override;
 
@@ -61,10 +59,6 @@ class AuthCheckerDigest final
       "SELECT username, nonce, timestamp, nonce_count, ha1 "
       "FROM auth_schema.users WHERE username=$1",
       storages::postgres::Query::Name{"select_user"}};
-
-  const storages::postgres::Query kSelectHA1{
-      "SELECT ha1 FROM auth_schema.users WHERE username=$1",
-      storages::postgres::Query::Name{"select_ha1"}};
 
   const storages::postgres::Query kUpdateUser{
       "UPDATE auth_schema.users "
@@ -100,24 +94,14 @@ class AuthCheckerDigest final
       storages::postgres::Query::Name{"select_unnamed_nonce"}};
 };
 
-std::optional<HA1> AuthCheckerDigest::GetHA1(std::string_view username) const {
-  storages::postgres::ResultSet res = pg_cluster_->Execute(
-      storages::postgres::ClusterHostType::kSlave, kSelectHA1, username);
-
-  return HA1{res.AsSingleRow<std::string>()};
-}
-
 std::optional<UserData> AuthCheckerDigest::FetchUserData(
     std::string_view username) const {
-  auto ha1_opt = GetHA1(username);
-  if (!ha1_opt.has_value()) return std::nullopt;
-
   storages::postgres::ResultSet res = pg_cluster_->Execute(
       storages::postgres::ClusterHostType::kSlave, kSelectUser, username);
 
   auto userDbInfo =
       res.AsSingleRow<UserDbInfo>(userver::storages::postgres::kRowTag);
-  return UserData{ha1_opt.value(), userDbInfo.nonce, userDbInfo.timestamp,
+  return UserData{HA1{userDbInfo.ha1}, userDbInfo.nonce, userDbInfo.timestamp,
                   userDbInfo.nonce_count};
 }
 
