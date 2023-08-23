@@ -224,7 +224,7 @@ async def test_expiring_nonce(service_client, mocked_time):
     )
     assert response.status == 200
 
-    mocked_time.sleep(15)
+    mocked_time.sleep(1500)
 
     authentication_info_header = response.headers["Authentication-Info"]
     authentication_directives_info = dict(reg.findall(authentication_info_header))
@@ -272,4 +272,60 @@ async def test_expiring_nonce(service_client, mocked_time):
         '/v1/hello', headers={'Authorization': auth_header},
     )
 
+    assert response.status == 200
+
+
+@pytest.mark.pgsql('auth', files=['test_data.sql'])
+async def test_aliving_nonce_after_half_ttl(service_client, mocked_time):
+    ## initial request without Authorization
+    response = await service_client.get('/v1/hello')
+    assert response.status == 401
+
+    ## parse WWW-Authenticate header into dictionary of directives and values
+    authentication_header = response.headers["WWW-Authenticate"]
+    authentication_directives = dict(reg.findall(authentication_header))
+
+    assert 'realm' in authentication_directives
+    assert 'nonce' in authentication_directives
+    assert 'algorithm' in authentication_directives
+    assert 'qop' in authentication_directives
+
+    ## now construct Authorization header sent from client
+    chal = {'realm': authentication_directives["realm"], 
+            'nonce': authentication_directives["nonce"],
+            'algorithm': authentication_directives["algorithm"],
+            'qop': "auth"
+            }
+
+    ## response will be calculated below
+    a = HTTPDigestAuth("username", "pswd")
+    a.init_per_thread_state()
+    a._thread_local.chal = chal
+    auth_header = a.build_digest_header('GET', '/v1/hello')
+
+    ## now send request with constructed Authorization header
+    response = await service_client.get(
+        '/v1/hello', headers={'Authorization': auth_header},
+    )
+    assert response.status == 200
+
+    mocked_time.sleep(500)
+
+    authentication_info_header = response.headers["Authentication-Info"]
+    authentication_directives_info = dict(reg.findall(authentication_info_header))
+
+    chal = {'realm': authentication_directives["realm"], 
+            'nonce': authentication_directives_info["nextnonce"],
+            'algorithm': authentication_directives["algorithm"],
+            'qop': "auth"
+            }
+
+    a = HTTPDigestAuth("username", "pswd")
+    a.init_per_thread_state()
+    a._thread_local.chal = chal
+    auth_header = a.build_digest_header('GET', '/v1/hello')
+
+    response = await service_client.get(
+        '/v1/hello', headers={'Authorization': auth_header},
+    )
     assert response.status == 200
